@@ -118,13 +118,11 @@ Function BeginYaoqiFengyin()
         Delay 1500
     End If
     Rem T_zhandou
-    If Test_YaoqiKszd() Then 
+    While Test_YaoqiKszd() 
         Tap qdX, qdY
         Delay 1500
-    Else 
-        Goto T_zhandou
-    End If
-	
+    Wend
+    
     Rem t_zb
     If TestZB() Then 
         TracePrint "找到准备界面啦"&qdX&","&qdY

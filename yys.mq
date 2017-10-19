@@ -1,0 +1,2776 @@
+Dim qdX, qdY, picPath
+Dim success = 0
+Dim failure = 0
+Dim changeSS = False
+Dim po = 0
+Dim YGTZ = 0
+Dim DJ = 0
+Dim YH = 0 '御魂
+Dim LTP = 1
+Dim YYH = 1
+Dim TP = 0
+Dim NextTSTime = 0
+Dim YYLJJSX  = 0
+Dim ZDTS = 0
+Dim runTime = 0
+Dim logFile = "/data/bt3.1.log.txt"
+Call File.Write(logFile,DateTime.Format())
+Call File.Append(logFile,"开始运行\n")
+GetTSZJ 
+BeginYaoqiFengyin 
+Test_YaoqiKszd
+While True
+    
+    //    If YGTZ = 0 and ( DateTime.Hour() = 20 or DateTime.Hour() = 13 ) Then
+    //        BeginYGTZ 
+    //        YGTZ = 1
+    //    ElseIf DateTime.Hour() <> 20 And DateTime.Hour() <> 13 Then
+    //        YGTZ = 0
+    //    End If
+    //    If DJ = 0 and DateTime.Hour() = 21 Then 
+    //        BeginDouji 
+    //        DJ = 1
+    //    End If
+   
+    If LTP = 1 And po <= 2 Then
+        success = 0
+        failure = 0
+        BEGINYYLJJ 
+    End If
+    If ZDTS = 1 Then 
+        BeginZDTS
+    End If
+    If ZDTS = 2 Then 
+        BeginZDTS2
+    End If
+    If TP = 1 Then 
+        Delay 1800
+        While TestTPJ() Or TestTPJ10() Or TestTPJ11() Or TestTPJ12() Or TestTPJ18() Or TestTPJ19() Or TestTPJ20() Or TestTPJ21()  Or TestTPJ27() Or TestTPJ28() Or TestTPJ29() Or TestTPJ30()
+            success = 0
+            failure = 0
+            If TestJJTP() Then 
+                Tap qdX + 30, qdY + 30
+                Call File.Append(logFile,qdX&","&qdY&"\n")
+                TracePrint "找到结界面啦"&qdX&","&qdY
+                Delay 1800
+                While  success + failure < 9 
+                    BeginJiejie(1)
+                Wend
+                
+                qdX = 970 + Int(150 * Rnd())
+                qdY = 520 + Int(40 * Rnd())
+                Tap qdX, qdY
+                Call File.Append(logFile, qdX & "," & qdY & "\n")
+                TracePrint "找到结界面啦"&qdX&","&qdY
+                Delay 800
+                If TestQD() Then 
+                    Tap qdX + 30, qdY + 30
+                    Call File.Append(logFile,qdX&","&qdY&"\n")
+                    TracePrint "找到结界面啦"&qdX&","&qdY
+                    Delay 1800
+                End If
+                qdX = 1163 + Int(40 * Rnd())
+                qdY = 46 + Int(40 * Rnd())
+                Tap qdX, qdY
+                Call File.Append(logFile, qdX & "," & qdY & "\n")
+                TracePrint "找到关闭面啦"&qdX&","&qdY
+              
+                Delay 800
+            End If
+        Wend
+    End If
+    
+    TracePrint "Po是"&po
+   
+    If YH = 1 Then 
+        success = 0
+        failure = 0
+        BeginYuHun
+    End If
+    If YYH = 1 Then 
+        success = 0
+        failure = 0
+        BeginYYH
+    End If
+    If NextTSTime = 0 or NextTSTime = DateTime.Hour() Then 
+        BeginTS 
+        BeginYaoqiFengyin()
+    End If
+     	 
+Wend
+'''''''''''''''''''''''''''''''''''''
+Function BeginYaoqiFengyin()
+    Rem t_start
+    If Test_YaoQiFY() Then 
+        Tap qdX, qdY
+        Delay 2800
+    Else 
+        Goto t_end
+    End If
+	
+    If Test_YaoqiZuidui() Then 
+        Tap qdX, qdY
+        Delay 1500
+    End If
+	
+    If Test_YaoqiChuangJian() Then 
+        Tap qdX, qdY
+        Delay 1500
+    End If
+    Rem T_zhandou
+    If Test_YaoqiKszd() Then 
+        Tap qdX, qdY
+        Delay 1500
+    Else 
+        Goto T_zhandou
+    End If
+	
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto check_win    
+    Else 
+        Delay 100  
+        Goto t_zb   
+    End If
+    ''''''''胜利界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 2000
+        
+        AcceptXSFY()
+    Else     
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 2000
+        AcceptXSFY()
+    End If
+    
+    Goto t_start
+    Rem t_end
+End Function
+Function Test_YaoqiKszd()
+    FindPic 912, 557, 1150, 710, "Attachment:yaoqikszd.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Test_YaoqiKszd = True
+        qdX = qdX -10 + Int(30 * Rnd())
+        qdY = qdY - 10 + Int(30 * Rnd())
+    Else 
+        Test_YaoqiKszd = False
+    End If
+End Function
+Function Test_YaoQiFY()
+    FindPic 117, 113, 1131, 635, "Attachment:yaoqify.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Test_YaoQiFY = True
+        qdX = qdX -10 + Int(30 * Rnd())
+        qdY = qdY - 10 + Int(30 * Rnd())
+    Else 
+        Test_YaoQiFY = False
+    End If
+End Function
+Function Test_YaoqiZuidui()
+    FindPic 996, 469, 1139, 590, "Attachment:yaoqiZudui.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX -10 + Int(60 * Rnd())
+        qdY = qdY - 10 + Int(60 * Rnd())
+        Test_YaoqiZuidui = True  
+    Else 
+        Test_YaoqiZuidui = False
+    End If
+End Function
+Function Test_YaoqiChuangJian()
+    FindPic 613, 485, 739, 543, "Attachment:yaoqichuangjian.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Test_YaoqiChuangJian = True
+        qdX = qdX -40 + Int(120 * Rnd())
+        qdY = qdY - 10 + Int(40 * Rnd())
+    Else 
+        Test_YaoqiChuangJian = False
+    End If
+End Function
+''''''''''''''''''''''''''''''''
+Function BeginZDTS
+    ''''''找加入界面
+    Rem t_start
+
+    If StartTS() Then 
+        Goto t_ts
+    End If
+    ''''''找探索界面
+    Rem t_ts
+
+    While Not TestTS_Zudui()
+        Delay 500
+    Wend
+    TracePrint "找到探索界面啦"&qdX&","&qdY
+    Tap qdX + 30, qdY + 30
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    TracePrint "找到结界面啦"&qdX&","&qdY
+    Delay 2000
+    AcceptXSFY 
+    Goto t_haoyou
+    ''''''''好友
+    Rem t_haoyou
+    If TestTS_haoyou() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 500
+    End If
+    Goto t_yinyangshi
+    Rem t_yinyangshi
+    If TestTS_yinyangshi() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 500
+    End If
+    Goto t_yaoqing
+    Rem t_yaoqing
+    While TestTS_yaoqing()  
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 10000
+    Wend
+    Goto t_zd
+    ''''''找战斗界面
+    Rem t_zd
+    TS_GENE() 
+    Rem t_qx
+    If  TestYHQX() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 5000
+        Goto t_end
+    End If
+    Rem t_end
+End Function
+Function BeginZDTS2()
+    Rem t_begin
+    While not TestTS_Jieshou()
+        Delay 500
+    Wend
+    Tap qdX + 30, qdY + 30
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    TracePrint "找到结界面啦"&qdX&","&qdY
+    Delay 2000
+    Rem t_zd
+    TS_GENE2()
+    Rem t_end
+End Function
+Function TS_GENE2()
+    
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 1800
+        //BeginChangeSS()
+        Delay 1800
+        Tap 1160, 553
+        
+        Call File.Append(logFile, "固定" & 1160 & "," & 553 & "\n")
+        TracePrint "固定" 
+        Goto t_checkyaoshu    
+    Else 
+        Delay 100  
+        Goto t_yuhun   
+    End If
+    Rem t_yuhun
+    If TestYh1() Then 
+        Goto t_end
+    Else 
+        Goto t_zb
+    End If
+    Rem t_checkyaoshu
+    If TestYaoShu1() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 800
+    End If
+    If TestYaoShu2() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 800
+    End If
+    Goto check_win_boss
+    ''''''找boss界面
+    ''''''找盒子界面
+    Rem t_hz
+    Delay 1800
+    AcceptXSFY()
+    If TestHZ() Then     
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        TracePrint "找到hz界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        Tap 120, 30
+        Call File.Append(logFile, "固定" & 120 & "," & 30 & "\n")
+        TracePrint "固定" 
+        Goto t_hz    
+    Else 
+        Goto t_bx
+    End If
+    ''''''''''''''''''''胜利boss'''''''''''''''''''''''''''''''''''
+    Rem check_win_boss
+    If TestWin() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        success = success + 1
+        Delay 12000
+        AcceptXSFY()
+        Goto t_hz    
+    Else 
+        TracePrint "找到bosssb界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        failure = failure + 1
+        Goto t_zb    
+    End If
+
+
+    ''''''找宝箱界面
+    Rem t_bx
+    Delay 1800
+    AcceptXSFY()
+    If TestBX() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        TracePrint "找到bx界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        Goto check_bx_win2    
+    Else    
+        Goto t_zb
+    End If
+
+    ''''''找获宝箱胜界2面
+    Rem check_bx_win2
+    If Test_Win2() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        AcceptXSFY()
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 12000
+        AcceptXSFY()
+        Goto t_bx   
+    End If
+    Rem t_end
+End Function
+Function TS_GENE()
+    
+    Rem t_zd
+    If TestZD() Then 
+    	
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        TracePrint "找到战斗界面啦"&qdX&","&qdY
+        Goto t_zb
+    Else 
+        Tap 1080, 600
+        Call File.Append(logFile, "固定" & 1080 & "," & 600 & "\n")
+        TracePrint "固定" 
+        Goto t_boss
+    End If
+    Rem t_tili
+    If TestTILI() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 1800
+        Goto t_boss
+    Else 
+        Delay 100
+        Goto t_tiliEnd
+    End If
+    Rem t_tiliEnd
+    If TestTILIEnd() Then 
+        NextTSTime = DateTime.Hour() + 1
+        Tap 935, 193
+        Call File.Append(logFile, "固定" & 935 & "," & 193 & "\n")
+        TracePrint "固定" 
+        Delay 800
+        Tap 51, 62
+        Call File.Append(logFile, "固定" & 51 & "," & 62 & "\n")
+        TracePrint "固定" 
+        Delay 800
+        If TestQR() Then 
+            Tap qdX + 30, qdY + 30
+            Call File.Append(logFile,qdX&","&qdY&"\n")
+            TracePrint "找到结界面啦"&qdX&","&qdY
+        End If
+        Delay 1800
+        Goto t_end
+    Else 
+        Delay 100
+        Goto t_zd2
+    End If
+    Rem t_zd2
+    If TestZD() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+              
+        TracePrint "找到战斗界面啦"&qdX&","&qdY
+        Goto t_zb
+    End If
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 1800
+        //BeginChangeSS()
+        Delay 1800
+        Tap 1160,553
+        Call File.Append(logFile, "固定" & 1160 & "," & 553 & "\n")
+        TracePrint "固定" 
+        Goto t_checkyaoshu    
+    Else 
+        Delay 100  
+        Goto t_tili   
+    End If
+    
+    Rem t_checkyaoshu
+    If TestYaoShu1() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    If TestYaoShu2() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    Goto check_win
+    ''''''找boss界面
+    Rem t_zb_boss
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 1800
+        //BeginChangeSS()
+        Delay 1800
+        Tap 1160, 553
+        Call File.Append(logFile, "固定" & 1160 & "," & 553 & "\n")
+        TracePrint "固定" 
+        Delay 5800
+        Goto check_win_boss    
+    Else 
+        Delay 100  
+        Goto t_zb_boss   
+    End If
+    
+    Rem t_boss
+    Delay 3800
+    AcceptXSFY()
+    If TestBoss() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到boss界面啦"&qdX&","&qdY
+        Goto t_zb_boss    
+    Else 
+        Goto t_zd
+    End If
+    ''''''找盒子界面
+    Rem t_hz
+    Delay 2800
+    AcceptXSFY()
+    If TestHZ() Then     
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到hz界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        Tap 120, 30
+        Call File.Append(logFile, "固定" & 120 & "," & 30 & "\n")
+        TracePrint "固定" 
+        Goto t_hz    
+    Else 
+        Goto t_bx
+    End If
+    ''''''找获胜界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1    
+    Else     
+        failure = failure + 1
+    End If
+    //    If changeSS Then 
+    //        Goto t_end
+    //    End If
+    Tap qdX + 30, qdY + 30
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    Delay 1800
+    Goto t_boss    
+
+    ''''''''''''''''''''胜利boss'''''''''''''''''''''''''''''''''''
+    Rem check_win_boss
+    If TestWin() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        success = success + 1
+        Delay 12000
+        AcceptXSFY()
+        Goto t_hz    
+    Else 
+        TracePrint "找到bosssb界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        failure = failure + 1
+        Goto t_boss    
+    End If
+
+    ''''''找宝箱界面
+    Rem t_bx
+    Delay 2800
+    AcceptXSFY()
+    If TestBX() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到bx界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        Goto check_bx_win2    
+    Else    
+        Goto t_end
+    End If
+
+    ''''''找获宝箱胜界2面
+    Rem check_bx_win2
+    If Test_Win2() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        AcceptXSFY()
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 12000
+        AcceptXSFY()
+        Goto t_bx   
+    End If
+    Rem t_end
+End Function
+Function TestTS_Jieshou()
+    FindPic 101, 200, 174, 294, "Attachment:TS_jieshou.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTS_Jieshou = True  
+    Else 
+        TestTS_Jieshou = False
+    End If
+End Function
+Function TestTS_Zudui()
+    Delay 1000
+    FindPic 616, 508, 696, 556, "Attachment:TS_zudui.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTS_Zudui = True  
+    Else 
+        TestTS_Zudui = False
+    End If
+End Function
+Function TestTS_haoyou
+    FindPic 489, 108, 558, 151, "Attachment:TS_haoyou.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTS_haoyou = True  
+    Else 
+        TestTS_haoyou = False
+    End If
+End Function
+Function TestTS_yinyangshi
+    FindPic 342, 161, 918, 525, "Attachment:TS_fengliu.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTS_yinyangshi = True  
+    Else 
+        TestTS_yinyangshi = False
+    End If
+End Function
+Function TestTS_yaoqing
+    FindPic 736, 554, 821, 596, "Attachment:TS_yaoqing.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTS_yaoqing = True  
+    Else 
+        TestTS_yaoqing = False
+    End If
+End Function
+''''''''''''''''''''''''''''''''
+Function BeginYYH
+    Rem t_begin
+    Rem t_yh
+    If TestYh1() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    Rem t_YYH
+    If TestYYH() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    
+    Rem t_Tiaozhan
+    If TestTiaozhan2() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+   
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto check_win    
+    Else 
+        Delay 100  
+        Goto t_zb   
+    End If
+    ''''''''胜利界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 5000
+        AcceptXSFY()
+    Else     
+        failure = failure + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 5000
+        AcceptXSFY()
+    End If
+    If failure + success < 3 Then 
+        Delay 2000
+        Goto t_Tiaozhan
+    End If
+    qdX = 1027 + Int(38 * Rnd())
+    qdY = 100 + Int(38 * Rnd())
+    Tap qdX, qdY
+    TracePrint "固定" 
+    Call File.Append(logFile,"固定"&1048&","&123&"\n")
+    Delay 800
+    Rem t_end
+End Function
+Function TestYYH
+    FindPic 702, 212, 750, 340, "Attachment:yyh.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYYH = True
+        qdX = qdX + Int(100 * Rnd())
+        qdY = qdY + Int(100 * Rnd())
+    Else 
+        TestYYH = False  
+    End If
+End Function
+Function TestTiaozhan2
+    FindPic 908, 466, 999, 520, "Attachment:tiaozhan2.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTiaozhan2 = True
+        qdX = qdX -48 + Int(200 * Rnd())
+        qdY = qdY -40 + Int(30 * Rnd())
+    Else 
+        TestTiaozhan2 = False  
+    End If
+End Function
+''''''''''''''''''''''''''''''''
+Function BeginYuhun
+    Rem t_begin
+    Rem t_yh
+    Delay 2000
+    If TestYh1() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile, qdX & "," & qdY & "\r\n")
+        TracePrint qdX&","&qdY
+        Delay 4800
+    Else
+        Goto t_end
+    End If
+    Rem t_DS
+    If Testyhds() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile, qdX & "," & qdY & "\n")
+        TracePrint qdX&","&qdY
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    Rem t_d4c
+    While Not (TestYHD10C() or  TestYHD10C2())
+        Swipe 400, 300, 400, 235
+        TracePrint "SWIP固定" 
+        Delay 1200
+    Wend 
+    TracePrint qdX&","&qdY
+    Tap qdX, qdY
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    Delay 1800
+    
+    Rem t_ZD
+    If TestYHZudui() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile, qdX & "," & qdY & "\n")
+        TracePrint qdx&","&qdY
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    Rem t_cJ1
+    If TestYHChuangJ() Then 
+        Tap qdX , qdY 
+        Call File.Append(logFile, qdX & "," & qdY & "\n")
+        TracePrint qdx&","&qdY
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    Rem t_CJ2
+    If TestYHChuangJ2() Then 
+        Tap qdX, qdY
+        TracePrint qdx&","&qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    Rem t_YQ
+    AcceptXSFY()
+    If TestYHYaoQ1() or TestYHYaoQ2() Then 
+        Goto t_YQ
+    ElseIf TestYHChuangJ2() Then
+        Tap qdX, qdY
+        Call File.Append(logFile, qdX & "," & qdY & "\n")
+        TracePrint qdx&","&qdY
+        Delay 1800
+        Goto t_YQ
+    Else 
+        Delay 400
+        Goto t_KSZD
+    End If
+    Rem t_KSZD
+    If TestYHKSZD() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile, qdX & "," & qdY & "\n")
+        TracePrint qdx&","&qdY
+        Delay 1800
+    Else
+        Goto t_end
+    End If
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto check_win    
+    Else 
+        Delay 100  
+        Goto t_zb   
+    End If
+    ''''''''胜利界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 2000
+        
+        AcceptXSFY()
+        Goto t_bx
+    Else     
+        failure = failure + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 2000
+        AcceptXSFY()
+        Goto t_bx
+    End If
+    Rem t_Bx
+    If success + failure > 4 And TestYHQX() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 5000
+        Goto t_end
+    ElseIf TestYHQD() Then
+        Tap qdX, qdY
+        Call File.Append(logFile, qdX  & "," & qdY & "\n")
+        TracePrint qdX  & "," & qdY
+        Delay 3800
+        Goto t_YQ
+    End If
+    Rem t_end
+End Function
+''''''''''''''''''''''''''''''''
+Function BeginDouji
+    Rem t_begin
+    If TestFanhui() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 10800
+    Else
+        Goto t_end
+    End If
+    ''tingzhong
+    Tap 735, 281
+    Call File.Append(logFile, "固定" & 735 & "," & 281 & "\n")
+    TracePrint "固定" 
+    Delay 10800
+    ''douji
+    Tap 576, 125
+    Call File.Append(logFile, "固定" & 576 & "," & 125 & "\n")
+    TracePrint "固定" 
+    Delay 5800
+    Rem t_zhan
+   
+    If TestZhan() Then 
+        If success = 10 or Datetime.hour() <> 21 Then 
+            Goto t_end
+        End If
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+        Goto t_zb
+    End If
+    Goto t_end
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto t_auto    
+    Else 
+        Delay 100  
+        Goto t_zb   
+    End If
+    '''''自动''''''''
+    Rem t_auto
+    If TestAuto() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto t_zhan
+    Else 
+        Goto T_auto
+        Delay 800
+    End If
+    ''''''''胜利界面
+    Rem check_win
+
+    //    If TestWin1() Then 
+    //        success = success + 1
+    //        Delay 1800
+    //        Tap qdX + 30, qdY + 30
+    //        Delay 5000
+    //        
+    //        AcceptXSFY()
+    //        Goto t_zhan
+    //    Else     
+    //        failure = failure + 1
+    //        Delay 1800
+    //        Tap qdX + 30, qdY + 30
+    //        Delay 5000
+    //        AcceptXSFY()
+    //        Goto t_zhan
+    //    End If
+    
+    Rem t_end
+    Tap 1176, 80
+    Call File.Append(logFile, "固定" & 1176 & "," & 80 & "\n")
+    TracePrint "固定" 
+    Delay 1800
+    Tap 1044, 270
+    Call File.Append(logFile, "固定" & 1044 & "," & 270 & "\n")
+    TracePrint "固定" 
+    Delay 10800
+    Tap 681, 150
+    Call File.Append(logFile, "固定" & 681 & "," & 150 & "\n")
+    TracePrint "固定" 
+    Delay 10800
+End Function
+Function TestAuto()
+    FindPic 18, 621, 94, 695, "Attachment:auto.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestAuto = True
+    Else 
+        TestAuto = False  
+    End If
+End Function
+Function TestZhan()
+    FindPic 1033, 533, 1196, 674, "Attachment:zhan.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestZhan = True
+    Else 
+        TestZhan = False  
+    End If
+End Function
+'''''''''''''''''式神碎片'''''''''
+Function BeginSSSP()
+    Rem t_begin
+    If TestSSSP() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    If TestSSSP1() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    Else 
+        Tap 1049, 162
+        Call File.Append(logFile, "固定" & 1049 & "," & 162 & "\n")
+        TracePrint "固定" 
+        Goto t_find
+    End If
+    If TestSSSPcon() and TestSSSPTZ() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 2800
+    End If
+    If TestSSYaoqing() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    If TestSSUser1() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    If TestSSYaoqing2() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    Goto t_end
+    Rem t_find
+    Delay 1800
+    If TestSSPindao() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    If TestSSXitong() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    If TestSSFaxian() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    Tap 700, 300
+    Call File.Append(logFile, "固定" & 700 & "," & 300 & "\n")
+    TracePrint "固定" 
+    Delay 2800
+    Rem t_end
+End Function
+Function TestSSSP()
+    FindPic 273, 625, 341, 704, "Attachment:sssp.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSSP = True
+    Else 
+        TestSSSP = False  
+    End If
+End Function
+Function TestSSSP1()
+    FindPic 400, 200, 437, 533, "Attachment:sssp1.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSSP1 = True
+    Else 
+        TestSSSP1 = False  
+    End If
+End Function
+Function TestSSSPcon()
+    FindPic 793, 518, 861, 552, "Attachment:ssspcon.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSSPcon = True
+    Else 
+        TestSSSPcon = False  
+    End If
+End Function
+Function TestSSSPTZ()
+    FindPic 914, 517, 989, 554, "Attachment:sssptiaozhan.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSSPTZ = True
+    Else 
+        TestSSSPTZ = False  
+    End If
+End Function
+Function TestSSYaoqing()
+    FindPic 563, 333, 1047, 399, "Attachment:yaoqin.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSYaoqing = True
+    Else 
+        TestSSYaoqing = False  
+    End If
+End Function
+Function TestSSYaoqing2()
+    FindPic 914, 517, 989, 554, "Attachment:yaoqin2.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSYaoqing2 = True
+    Else 
+        TestSSYaoqing2 = False  
+    End If
+End Function
+Function TestSSUser1()
+    FindPic 416, 138, 947, 533, "Attachment:paihuai.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSUser1 = True
+    Else 
+        TestSSUser1 = False  
+    End If
+End Function
+'''faxian''
+Function TestSSPindao()
+    FindPic 1177, 1, 1240, 46, "Attachment:sspindao.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSPindao = True
+    Else 
+        TestSSPindao = False  
+    End If
+End Function
+Function TestSSXitong()
+    FindPic 13, 30, 53, 108, "Attachment:ssxitong.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSXitong = True
+    Else 
+        TestSSXitong = False  
+    End If
+End Function
+Function TestSSFaxian()
+    FindPic 90, 10, 195, 602, "Attachment:ssfaxian.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSFaxian = True
+    Else 
+        TestSSFaxian = False  
+    End If
+End Function
+Function TestSSZD()
+    FindPic 90, 10, 195, 602, "Attachment:kaishizd.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSSZD = True
+    Else 
+        TestSSZD = False  
+    End If
+End Function
+
+'''''''''''''''''更换式神'''''''''''''''''''
+Function BeginChangeSS()
+    If TestMan1() Then 
+        BeginChangeSS1()
+    End If
+    //    If TestMan2() Then 
+    //        BeginChangeSS2()
+    //    End If
+End Function
+Function BeginChangeSS1()
+    Delay 2800
+    qdX = 153 + Int(200 * Rnd())
+    qdY = 470 + Int(70 * Rnd())
+    Tap qdX, qdY
+    
+    Tap qdX, qdY
+    Call File.Append(logFile, "固定" & 430 & "," & 562 & "\n")
+    TracePrint "固定" 
+    Delay 1800
+    Rem t_quanbu 
+    If TestQuanBu() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+        //    Else 
+        //        Delay 1800
+        //        Goto t_quanbu
+    End If
+    If TestN() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    Rem t_change1
+    
+    //    While Not (TestSS_Denglong() or  TestSS_JishengHun())
+    //        Swipe 604, 603, 478, 603
+    //        TracePrint "SWIP固定" 
+    //        Delay 800
+    //    Wend
+    qdX = 186 + Int(70 * Rnd())
+    qdY = 546 + Int(80 * Rnd())
+    Swipe qdX, qdY, 570+Int(100 * Rnd()), 259+Int(90 * Rnd())
+    Rem t_change2
+    Delay 1000
+    //    While Not TestSS_Denglong() And Not TestSS_JishengHun()
+    //        Swipe 604, 603, 478, 603
+    //        TracePrint "SWIP固定" 
+    //        Delay 800
+    //    Wend
+    qdX = 823 + Int(60 * Rnd())
+    qdY = 542 + Int(80 * Rnd())
+    Swipe qdX, qdY, 1022 + Int(100 * Rnd()), 304 + Int(90 * Rnd())
+    Delay 800
+    qdX = 24 + Int(20 * Rnd())
+    qdY = 19 + Int(20 * Rnd())
+    Tap qdX, qdY
+    Call File.Append(logFile, "固定" & 34 & "," & 28 & "\n")
+    TracePrint "固定" 
+End Function
+Function BeginChangeSS2()
+    Delay 2800
+    Tap 400, 280
+    Tap 400, 280
+    Call File.Append(logFile,"固定"&400&","&400&"\n")
+    Delay 1800
+    Rem t_quanbu 
+    If TestQuanBu() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    Else 
+        Delay 1800
+        Goto t_quanbu
+    End If
+    If TestN() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    Rem t_change1
+    
+    While Not TestSS_BaiDM() And Not TestSS_BaiDM20()
+        Swipe 604, 603, 478, 603
+        TracePrint "SWIP固定" 
+        Delay 800
+    Wend
+    Swipe qdX + 30, qdY + 30, 378, 231
+    Delay 1000
+    Rem t_change2
+    While Not TestSS_BaiDM() and Not TestSS_BaiDM20()
+        Swipe 604, 603, 478, 603
+        TracePrint "SWIP固定" 
+        Delay 800
+    Wend
+    Swipe qdX + 30, qdY + 30, 815, 252
+    Tap 34, 28
+    Call File.Append(logFile, "固定" & 34 & "," & 28 & "\n")
+    TracePrint "固定" 
+End Function
+'''''''''''YGTZ‘’
+Function BeginYGTZ()
+    
+    Rem t_begin
+    If TestFanhui() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 10800
+    Else
+        Goto t_end
+    End If
+    If TestShitou() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+    Else 
+        Goto t_end
+    End If
+    If TestGuiWang() Then 
+        Swipe qdX + 30, qdY + 30,qdX + 30, qdY - 120
+        Delay 2800
+    Else 
+        Goto t_end
+    End If
+    If TestYaoGuai() Then
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 2800
+    Else 
+        Goto t_end
+    End If
+    If TestQianWang() Then
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 4800
+    Else 
+        Goto t_end
+    End If
+    
+    If TestHongDM() Then
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+    Else 
+        Goto t_end
+    End If
+    If TestTiaoZhan() Then
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 4800
+    Else 
+        Goto t_end
+    End If
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 800
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Tap qdX + 30, qdY + 30  
+        Goto check_win    
+    Else 
+        Delay 100  
+        Goto t_zb   
+    End If
+    ''''''''胜利界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 5000
+        
+        AcceptXSFY()
+        Goto t_bx
+    Else     
+        failure = failure + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 5000
+        AcceptXSFY()
+        Goto t_bx
+    End If
+    ''''''找宝箱界面
+    Rem t_bx
+    Delay 2800
+    AcceptXSFY()
+    If TestBX2() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到bx界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        Goto check_bx_win2    
+    Else    
+        Goto t_end
+    End If
+
+    ''''''找获宝箱胜界2面
+    Rem check_bx_win2
+    If Test_Win2() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        AcceptXSFY()
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 12000
+        AcceptXSFY()
+        Goto t_fanhui   
+    End If
+    Rem t_fanhui
+    If TestFanhui2() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 10800
+    Else
+        Goto t_end
+    End If
+    Rem t_end
+  
+    Tap 681, 150
+    Call File.Append(logFile, "固定" & 681 & "," & 150 & "\n")
+    TracePrint "固定" 
+    Delay 10800
+End Function
+'''''''''''YYL结界'''''''''''''''''''''
+Function BEGINYYLJJ() 
+    success = 0
+    failure = 0
+    po = 0
+    Call File.Append(logFile,DateTime.Format())
+    Call File.Append(logFile,"开始阴阳寮结界\n")
+    If TestJJTP() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到攻击面啦"&qdX&","&qdY
+        Delay 1800
+        If TESTYYL() Then 
+            //        	po = 0
+            Tap qdX + 30, qdY + 30
+            Call File.Append(logFile,qdX&","&qdY&"\n")
+            TracePrint "找到攻击面啦"&qdX&","&qdY
+            Delay 1800
+            
+            success = 0
+            failure = 0
+    
+            If TESTXUNZ1() Then 
+                While TESTXUNZ1() And success < 6
+                    Call File.Append(logFile,DateTime.Format())
+                    Call File.Append(logFile,"找到第一个寮突破\n")
+                    Tap qdX + 30, qdY + 30
+                    Call File.Append(logFile,qdX&","&qdY&"\n")
+                    TracePrint "找到攻击面啦"&qdX&","&qdY
+                    TracePrint "success "&success
+                    Delay 1800
+                
+                    BeginJiejie (2)
+                Wend
+            ElseIf  TestPO1() Then 
+                po = po + 1
+            End If
+            Delay 1800
+            
+            success = 0
+            failure = 0
+    
+            If TESTXUNZ2() Then 
+                While TESTXUNZ2() And success < 6
+                    Call File.Append(logFile,DateTime.Format())
+                    Call File.Append(logFile,"找到第二个寮突破\n")
+            
+                    Tap qdX + 30, qdY + 30
+                    Call File.Append(logFile,qdX&","&qdY&"\n")
+                    TracePrint "找到攻击面啦"&qdX&","&qdY
+                    TracePrint "success "&success
+                    Delay 1800
+               
+                    BeginJiejie (2)
+                Wend
+            ElseIf TestPO1() Then 
+                po = po + 1
+            End If
+            Delay 1800
+            
+            success = 0
+            failure = 0
+    
+            If TESTXUNZ3() Then 
+                While TESTXUNZ3() And success < 6
+           
+                    Call File.Append(logFile,DateTime.Format())
+                    Call File.Append(logFile,"找到第三个寮突破\n")
+                    Tap qdX + 30, qdY + 30
+                    Call File.Append(logFile,qdX&","&qdY&"\n")
+                    TracePrint "找到攻击面啦"&qdX&","&qdY
+                    TracePrint "success "&success
+                    Delay 1800
+               
+                    BeginJiejie (2)
+                Wend
+            ElseIf TestPO1() Then 
+                po = po + 1
+            End If
+            Delay 1000
+            
+            qdX = 1163
+            qdY = 45
+            qdX = qdX + Int(35 * Rnd())
+            qdY = qdY + Int(35 * Rnd())
+            Tap qdX, qdY
+            Call File.Append(logFile,qdX&","&qdY&"\n")
+            TracePrint "找到攻击面啦"&qdX&","&qdY
+            Delay 800
+        End If
+    End If
+End Function
+''''''''''探索主程序''''''''''''''''''''
+Function BeginTS()
+    
+    ''''''找加入界面
+    Rem t_start
+    AcceptXSFY()
+    If StartTS() Then 
+        Goto t_ts
+    End If
+    ''''''找探索界面
+    Rem t_ts
+
+    While Not TestTS()
+        Delay 500
+    Wend
+    TracePrint "找到探索界面啦"&qdX&","&qdY
+    Tap qdX + 30, qdY + 30
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    Delay 2000
+    AcceptXSFY()
+    Goto t_zd 
+    ''''''找战斗界面
+    Rem t_zd
+    
+    If TestZD() Then 
+    	
+        Tap qdX + 30, qdY + 30
+        Delay 500
+        If Test_DangTianBuzai() Then 
+            Tap qdX, qdY
+            Delay 200
+        End If
+        If Test_DangTianQuxiao() Then 
+            Tap qdX, qdY
+            Goto t_zd
+        End If
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到战斗界面啦"&qdX&","&qdY
+        Goto t_zb
+    Else 
+        Dim swipx =   Int(100 * Rnd())
+        Dim swipy =   Int(50 * Rnd())
+        Tap 980 + swipx, 560 + swipy
+        Call File.Append(logFile,  980 + swipx & "," & 560 + swipy & "\n")
+        TracePrint 980 + swipx&","& 560 + swipy
+        Goto t_boss
+    End If
+    Rem t_tili
+    If TestTILI() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 1800
+        Goto t_boss
+    Else 
+        Delay 100
+        Goto t_tiliEnd
+    End If
+    Rem t_tiliEnd
+    If TestTILIEnd() Then 
+        NextTSTime = DateTime.Hour() + 1
+        Tap 935, 193
+        Call File.Append(logFile, "固定" & 935 & "," & 193 & "\n")
+        TracePrint "固定" 
+        Delay 800
+        Tap 51, 62
+        Call File.Append(logFile, "固定" & 51 & "," & 62 & "\n")
+        TracePrint "固定" 
+        Delay 800
+        If TestQR() Then 
+            Tap qdX + 30, qdY + 30
+            Call File.Append(logFile,qdX&","&qdY&"\n")
+        End If
+        Delay 1800
+        Goto t_end
+    Else 
+        Delay 100
+        Goto t_zb
+    End If
+    Rem t_zb
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 1800
+        BeginChangeSS()
+        Delay 1800
+        While Not TestZB() 
+            TracePrint "无法准备"
+            Call File.Append(logFile,"cant be ready\n")
+            Delay 800
+        Wend
+        
+        Tap qdx+30,qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto t_checkyaoshu    
+    Else 
+        Delay 100  
+        Goto t_tili   
+    End If
+    
+    Rem t_checkyaoshu
+    If TestYaoShu1() Then 
+        Tap qdX , qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+    End If
+    If TestYaoShu2() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 800
+    End If
+    Goto check_win
+    ''''''找boss界面
+    Rem t_zb_boss
+    If Test_DangTianBuzai() Then 
+        Goto t_zd
+    End If
+    
+    If TestZB() Then 
+        TracePrint "找到准备界面啦"&qdX&","&qdY
+        Delay 1800
+        // BeginChangeSS()
+        Delay 1800
+        While Not TestZB() 
+            TracePrint "无法准备Boss"
+            Call File.Append(logFile,"cant be ready\n")
+            Delay 800
+        Wend
+        Tap qdx+30,qdY + 30
+        Call File.Append(logFile,  qdx+30 & "," & qdY + 30 & "\n")
+        TracePrint "准备" & qdx+30 & "," & qdY + 30
+      
+       
+        Delay 5800
+        Goto check_win_boss    
+    Else 
+        Delay 100  
+        Goto t_zb_boss   
+    End If
+    
+    Rem t_boss
+    Delay 3800
+    AcceptXSFY()
+    If TestBoss() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到boss界面啦"&qdX&","&qdY
+        Goto t_zb_boss    
+    Else 
+        Goto t_zd
+    End If
+    ''''''找盒子界面
+    Rem t_hz
+    Delay 2800
+    AcceptXSFY()
+    If TestHZ() Then     
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到hz界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        swipx =   Int(200 * Rnd())
+        swipy =   Int(200 * Rnd())
+        Tap 120 + swipx, 30 + swipy
+        Call File.Append(logFile,   120 + swipx & "," &  30 + swipy & "\n")
+        
+        Goto t_hz    
+    Else 
+        Goto t_bx
+    End If
+    ''''''找获胜界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1    
+    Else     
+        failure = failure + 1
+    End If
+    //    If changeSS Then 
+    //        Goto t_end
+    //    End If
+    Tap qdX + 30, qdY + 30
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    Delay 1800
+    Goto t_boss    
+
+    ''''''''''''''''''''胜利boss'''''''''''''''''''''''''''''''''''
+    Rem check_win_boss
+    If TestWin() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        success = success + 1
+        Delay 12000
+        AcceptXSFY()
+        Goto t_hz    
+    Else 
+        TracePrint "找到bosssb界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        failure = failure + 1
+        Goto t_boss    
+    End If
+
+    ''''''找宝箱界面
+    Rem t_bx
+    Delay 2800
+    AcceptXSFY()
+    If TestBX() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到bx界面啦"&qdX&","&qdY
+        Delay 2800
+        AcceptXSFY()
+        Goto check_bx_win2    
+    Else    
+        Goto t_end
+    End If
+
+    ''''''找获宝箱胜界2面
+    Rem check_bx_win2
+    If Test_Win2() Then 
+        TracePrint "找到bosss胜利3界面啦"&qdX&","&qdY
+        Delay 1800
+        AcceptXSFY()
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Delay 12000
+        AcceptXSFY()
+        Goto t_bx   
+    End If
+    Rem t_end
+End Function
+
+''''''''''''''''''''''''''''''''''辅助函数区域'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Rem t_func
+
+Function StartTS()
+	
+    While Not TestZ()
+    	
+        Dim swipx =   Int(60 * Rnd())
+        Dim swipy =   Int(100 * Rnd())
+        Swipe 1170 + swipx, 167 + swipy, 1170 + swipx, 245 + swipy
+        TracePrint "SWIP"&1170 + swipx&","&167 + swipy&","& 1170 + swipx&", "&245 + swipy
+        
+    Wend
+    TracePrint "找到加入界面啦"&qdX&","&qdY
+    Tap qdX + 30, qdY + 30
+    Call File.Append(logFile,qdX&","&qdY&"\n")
+    StartTS = True
+End Function
+Function TestZ() 
+    Delay 1000
+    FindPic 1016, 147, 1236, 649, picPath, "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestZ = True
+    Else 
+        TestZ = False
+    End If
+End Function
+Function TestTS()
+    Delay 1000
+    FindPic 911, 508, 991, 556, "Attachment:ts.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTS = True
+        qdX = qdX + Int(50 * Rnd())
+        qdY = qdY -18 +Int(25 * Rnd())
+    Else 
+        TestTS = False
+    End If
+End Function
+Function TestZD()
+    Delay 1800
+    FindPic 3, 200, 1200, 558, "Attachment:zd3.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestZD = True 
+    Else 
+        TestZD = False 
+    End If
+End Function
+Function TestBoss()
+    FindPic 3, 10, 1200, 758, "Attachment:boss3.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestBoss = True   
+    Else 
+        TestBoss = False
+    End If
+End Function
+Function TestHZ()
+    FindPic 3, 10, 1200, 758, "Attachment:hz.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestHZ = True
+    Else 
+        TestHZ = False
+    End If
+End Function
+Function TestBX()
+    FindPic 3, 10, 1200, 758, "Attachment:bx.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestBX = True
+    Else 
+        TestBX = False
+    End If
+End Function
+Function TestBX2()
+    FindPic 3, 10, 1200, 758, "Attachment:bx2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestBX2 = True
+    Else 
+        TestBX2 = False
+    End If
+End Function
+Function GetTSZJ()
+    If ReadUIConfig("下拉框1") = 0 Then 
+        picPath = "Attachment:d1z.png"
+    ElseIf ReadUIConfig("下拉框1") = 1 Then
+        picPath = "Attachment:d2z.png"
+    ElseIf ReadUIConfig("下拉框1") = 2 Then
+        picPath = "Attachment:d3z.png"
+    ElseIf ReadUIConfig("下拉框1") = 3 Then
+        picPath = "Attachment:d4z.png"
+    ElseIf ReadUIConfig("下拉框1") = 4 Then
+        picPath = "Attachment:d5z.png"
+    ElseIf ReadUIConfig("下拉框1") = 5 Then
+        picPath = "Attachment:d6z.png"
+    ElseIf ReadUIConfig("下拉框1") = 6 Then
+        picPath = "Attachment:d7z.png"
+    ElseIf ReadUIConfig("下拉框1") = 7 Then
+        picPath = "Attachment:d8z.png"
+    ElseIf ReadUIConfig("下拉框1") = 8 Then
+        picPath = "Attachment:d9z.png"
+    ElseIf ReadUIConfig("下拉框1") = 9 Then
+        picPath = "Attachment:d10z.png"
+    ElseIf ReadUIConfig("下拉框1") = 10 Then
+        picPath = "Attachment:d11z.png"
+    ElseIf ReadUIConfig("下拉框1") = 11 Then
+        picPath = "Attachment:d12z.png"
+    ElseIf ReadUIConfig("下拉框1") = 12 Then
+        picPath = "Attachment:d13z.png"
+    ElseIf ReadUIConfig("下拉框1") = 13 Then
+        picPath = "Attachment:d14z.png"
+    ElseIf ReadUIConfig("下拉框1") = 14 Then
+        picPath = "Attachment:d15z.png"
+    ElseIf ReadUIConfig("下拉框1") = 15 Then
+        picPath = "Attachment:d16z.png"
+    ElseIf ReadUIConfig("下拉框1") = 16 Then
+        picPath = "Attachment:d17z.png"
+    ElseIf ReadUIConfig("下拉框1") = 17 Then
+        picPath = "Attachment:d18z.png"
+    ElseIf ReadUIConfig("下拉框1") = 18 Then
+        picPath = "Attachment:d19z.png"
+    ElseIf ReadUIConfig("下拉框1") = 19 Then
+        picPath = "Attachment:d20z.png"
+    ElseIf ReadUIConfig("下拉框1") = 20 Then
+        picPath = "Attachment:d21z.png"
+    ElseIf ReadUIConfig("下拉框1") = 21 Then
+        picPath = "Attachment:d22z.png"
+    ElseIf ReadUIConfig("下拉框1") = 22 Then
+        picPath = "Attachment:d23z.png"
+    Else 
+        picPath = "Attachment:d16z.png"
+    End If
+    ''''
+    If ReadUIConfig("阴阳寮结界顺序") = 0 Then 
+        YYLJJSX = 0
+    ElseIf ReadUIConfig("阴阳寮结界顺序") = 1 Then
+        YYLJJSX = 2
+    Else 
+        YYLJJSX = 0
+    End if
+    '''douji
+    If ReadUIConfig("多选框1")=true then
+        DJ = 0
+    Else
+        DJ = 1
+    End If
+    If ReadUIConfig("御魂")=true then
+        YH = 1
+    Else
+        YH = 0
+    End If
+    If ReadUIConfig("业原火")=true then
+        YYH = 1
+    Else
+        YYH = 0
+    End If
+    If ReadUIConfig("寮突破")=true then
+        LTP = 1
+    Else
+        LTP = 0
+    End If
+    If ReadUIConfig("探索")=true then
+        NextTSTime = 0
+    Else
+        NextTSTime = 30
+    End If
+    '''yaoguaituizhi
+    If ReadUIConfig("多选框2")=true then
+        YGTZ=0
+    Else
+        YGTZ=1
+    End If
+    If ReadUIConfig("个人突破")=true then
+        TP=1
+    Else
+        TP=0
+    End If
+    If ReadUIConfig("组队探索") = 0 Then 
+        ZDTS = 0
+    ElseIf ReadUIConfig("组队探索") = 1 Then
+        ZDTS = 1
+    ElseIf ReadUIConfig("组队探索") = 2 Then
+        ZDTS = 2
+    Else 
+        ZDTS = 0
+    End if
+    
+End Function
+Function TestWin1()
+    ''''''找获胜界面
+    Rem check_sl1
+    TracePrint "成功"&success&"次,失败"&failure&"次"
+    FindPic 0, 0, 644, 438, "Attachment:sl.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TracePrint "找到s胜利1界面啦"&qdX&","&qdY
+        //        If TestLV20New() Then 
+        //            TracePrint "找到20级升级界面啦"&qdX&","&qdY
+        //            changeSS = True
+        //            //            Goto t_func_end
+        //        End If
+        //        If TestLV25New() Then 
+        //            TracePrint "找到25级界面啦"&qdX&","&qdY
+        //            changeSS = True
+        //            //            Goto t_func_end
+        //        End If
+        Delay 2800
+        AcceptXSFY 
+        TestWin1 = True
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto t_func_end    
+    Else 
+        Delay 1800
+        AcceptXSFY()
+        Goto check_sb    
+    End If
+
+    
+    ''''''找失败界面
+    Rem check_sb
+
+    FindPic 0, 0, 630, 321, "Attachment:sb2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then
+        TestWin1 = False
+    Else 
+        Delay 1800
+        AcceptXSFY()
+        Goto check_sl1    
+    End If
+    Rem t_func_end
+End Function
+Function TestWin()
+    ''''''找获胜界面
+    Rem check_sl1
+    //    TracePrint "成功"&success&"次,失败"&failure&"次"
+    Goto check_sl2    
+    FindPic 0, 0, 644, 438, "Attachment:sl.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+    	
+        Call File.Append(logFile,DateTime.Format())
+        Call File.Append(logFile,"找到胜利1界面\n")
+        TracePrint "找到s胜利1界面啦"&qdX&","&qdY
+        //        If TestLV20New() Then 
+        //            TracePrint "找到20级升级界面啦"&qdX&","&qdY
+        //            changeSS = True
+        //            //            Goto t_func_end
+        //        End If
+        //        If TestLV25New() Then 
+        //            TracePrint "找到25级界面啦"&qdX&","&qdY
+        //            changeSS = True
+        //            //            Goto t_func_end
+        //        End If
+        Delay 2800
+        AcceptXSFY 
+        FindPic 0, 0, 644, 438, "Attachment:sl.png", "000000", 0, 0.7, qdX, qdY
+        TracePrint "找到WINCHECK面啦"&qdX&","&qdY
+        qdX = qdX + Int(300 * Rnd())
+        qdY = qdY +Int(50 * Rnd())
+        Tap qdX + 30, qdY + 30
+        
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到攻击面啦"&qdX&","&qdY
+        Goto check_sl2    
+    Else 
+        Delay 500
+        AcceptXSFY()
+        Goto check_sb    
+    End If
+
+    ''''''找获胜界2面
+    Rem check_sl2
+    If Test_Win2() then
+        TestWin = True
+        Goto t_func_end
+    Else 
+        //Goto check_sl2
+        TestWin = False
+        Goto t_func_end
+    End If
+    ''''''找失败界面
+    Rem check_sb
+
+    FindPic 0, 0, 644, 438, "Attachment:sb2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Call File.Append(logFile,DateTime.Format())
+        Call File.Append(logFile,"找到失败界面\n")
+        TestWin = False
+        qdX = qdX + Int(300 * Rnd())
+        qdY = qdY +Int(50 * Rnd())
+    Else 
+        Delay 500
+        AcceptXSFY()
+        Goto check_sl1    
+    End If
+    Rem t_func_end
+End Function
+Function Test_Win2()
+    //Delay 2000
+    runTime = 0
+    Goto check_bxsl3
+    Rem check_bxsl2
+    FindPic 572, 382, 681, 453	, "Attachment:sl2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Call File.Append(logFile,DateTime.Format())
+        Call File.Append(logFile,"找到胜利2界面\n")
+        TracePrint "找到bosss胜利2界面啦"&qdX&","&qdY
+        Delay 1800
+        qdX = qdX + Int(100 * Rnd())
+        qdY = qdY -30 +Int(80 * Rnd())
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        Goto check_bxsl3    
+    Else 
+        Delay 100
+        Goto check_bxsl2    
+    End If
+
+    ''''''找获宝箱胜界3面
+    Rem check_bxsl3
+    FindPic 570, 506, 692, 575, "Attachment:sl31.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX + Int(100 * Rnd())
+        qdY = qdY -30 +Int(80 * Rnd())
+        Test_Win2 = True
+        Goto func_end
+    Else 
+        Delay 1800
+        runTime = runTime + 1
+        TracePrint runTime
+        If runTime > 150 Then 
+            runTime = 1
+            qdX = 19 + Int(30 * Rnd())
+            qdY = 15 + Int(30 * Rnd())
+            Tap qdX, qdY
+            Delay 2000
+            
+            qdX = 695 + Int(90 * Rnd())
+            qdY = 400 + Int(44 * Rnd())
+            Tap qdX, qdY
+            Delay 2000
+            
+        End If
+        Goto check_sb    
+    End If
+    
+    Rem check_sb
+    
+    If TestYaoShu1() Then 
+        Tap qdX , qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+    End If
+    If TestYaoShu2() Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+    End If
+    FindPic 0, 0, 644, 438, "Attachment:sb2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Call File.Append(logFile,DateTime.Format())
+        Call File.Append(logFile,"找到失败界面\n")
+        Test_Win2 = False
+        qdX = qdX + Int(300 * Rnd())
+        qdY = qdY +Int(50 * Rnd())
+    Else 
+        Delay 1800
+        AcceptXSFY()
+        Goto check_bxsl3    
+    End If
+     
+    Rem func_end
+End Function
+Function TestLV20()
+    FindPic 250, 300, 1171, 535	, "Attachment:lv20.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestLV20 = True
+    Else     
+        TestLV20 = False    
+    End If
+End Function
+Function TestLV25()
+    FindPic 250, 300, 1171, 535	, "Attachment:lv25.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestLV25 = True
+    Else     
+        TestLV25 = False    
+    End If
+End Function
+Function TestLV20New()
+    FindMultiColor 240,322,1157,545,"BECFD5","7|2|C2D4DA,1|10|D8EAEF,15|9|0F1822,18|9|D1E3E8,11|3|B6C7CD,45|11|04DAEA,69|-12|199AF5,80|9|05CEE2,40|-13|1997F4",1,0.8,qdX,qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestLV20New = True
+    Else     
+        TestLV20New = False    
+    End If
+
+End Function
+Function TestLV25New()
+    FindMultiColor 240,322,1157,545,"CDDFE4","0|-9|BDCED4,6|1|A8B8BE,12|-11|D5E7ED,11|1|CBDDE2,17|0|C4D5DB,45|2|04D6E5,80|0|05CFE4,77|-22|1996F3,46|-23|1A96F6",1,0.8,qdX,qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestLV25New = True
+    Else     
+        TestLV25New = False    
+    End If
+
+End Function
+''''''''''''''''''结界函数库
+Function BeginJiejie(Flag)
+    Rem t_start
+    Delay 3000
+    AcceptXSFY()
+    If Flag = 1 Then
+        If TestJieJie() Then     
+            Tap qdX , qdY       
+            Call File.Append(logFile,DateTime.Format())
+            Call File.Append(logFile,qdX&","&qdY&"\n")
+            TracePrint "找到结界面啦"&qdX&","&qdY
+            Goto t_gj    
+        Else 
+    
+            Goto t_end
+        End If
+    ElseIf Flag = 2 Then
+        If  TestJieJie() Then     
+            Tap qdX, qdY
+            Call File.Append(logFile,qdX&","&qdY&"\n")
+            Call File.Append(logFile,DateTime.Format())
+            Call File.Append(logFile,"找到寮突破目标\n")
+            
+            TracePrint "找到结界面啦"&qdX&","&qdY
+            Goto t_gj    
+        Else 
+            success = 9
+            Goto t_end
+        End If
+    End If
+    
+    ''''''''攻击
+    Rem t_gj    
+    If (Flag = 1 And TestGJ()) Or (Flag = 2 And TestGJ2()) Then 
+        Tap qdX, qdY
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到攻击面啦"&qdX&","&qdY
+        Goto t_zb    
+    Else 
+        qdX = 1 + Int(80 * Rnd())
+        qdY = 1 + Int(80 * Rnd())
+        Tap 20, 20
+        Call File.Append(logFile, qdX & "," & qdY & "\n")
+        TracePrint "找到关闭面啦"&20&","&20
+        Goto t_end
+    End If
+    ''''''''准备
+    Rem t_zb
+    If TestZB() Then 
+        Call File.Append(logFile,DateTime.Format())
+        Delay 800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Goto check_win    
+    Else 
+        Delay 100  
+        Goto t_zb   
+    End If
+    ''''''''胜利界面
+    Rem check_win
+
+    If TestWin() Then 
+        success = success + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 5000
+        
+        AcceptXSFY()
+        If Flag = 1 And success <> 0 And success Mod 3 = 0 Then 
+            Goto check_win2
+        Else 
+            Goto t_end
+        End If
+    Else     
+        failure = failure + 1
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 5000
+        AcceptXSFY()
+        Goto t_end
+    End If   
+    
+    ''''''找额外胜界2面
+    Rem check_win2
+    If Test_Win2() Then 
+        Call File.Append(logFile,DateTime.Format())
+        Call File.Append(logFile,"找到三次胜利的额外奖励\n")       
+        TracePrint "找到额外奖励界面啦"&qdX&","&qdY
+        Delay 1800
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到结界面啦"&qdX&","&qdY
+        Delay 1800
+        Goto t_end
+    Else 
+        Goto t_end
+    End If
+    Rem t_end
+End Function
+
+Function TestTPJ()
+    FindPic 671, 0, 866, 47, "Attachment:tpj.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ = True
+    Else 
+        TestTPJ = False
+    End If
+End Function
+Function TestTPJ10()
+    FindPic 671, 0, 866, 47, "Attachment:tpj10.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ10 = True
+    Else 
+        TestTPJ10 = False
+    End If
+End Function
+Function TestTPJ11()
+    FindPic 671, 0, 866, 47, "Attachment:tpj11.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ11 = True
+    Else 
+        TestTPJ11 = False
+    End If
+End Function
+Function TestTPJ12()
+    FindPic 671, 0, 866, 47, "Attachment:tpj12.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ12 = True
+    Else 
+        TestTPJ12 = False
+    End If
+End Function
+Function TestTPJ18()
+    FindPic 671, 0, 866, 47, "Attachment:tpj18.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ18 = True
+    Else 
+        TestTPJ18 = False
+    End If
+End Function
+Function TestTPJ19()
+    FindPic 671, 0, 866, 47, "Attachment:tpj19.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ19 = True
+    Else 
+        TestTPJ19 = False
+    End If
+End Function
+Function TestTPJ20()
+    FindPic 671, 0, 866, 47, "Attachment:tpj20.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ20 = True
+    Else 
+        TestTPJ20 = False
+    End If
+End Function
+Function TestTPJ21()
+    FindPic 671, 0, 866, 47, "Attachment:tpj21.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ21 = True
+    Else 
+        TestTPJ21 = False
+    End If
+End Function
+Function TestTPJ27()
+    FindPic 671, 0, 866, 47, "Attachment:tpj27.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ27 = True
+    Else 
+        TestTPJ27 = False
+    End If
+End Function
+Function TestTPJ28()
+    FindPic 671, 0, 866, 47, "Attachment:tpj28.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ28 = True
+    Else 
+        TestTPJ28 = False
+    End If
+End Function
+Function TestTPJ29()
+    FindPic 671, 0, 866, 47, "Attachment:tpj29.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ29 = True
+    Else 
+        TestTPJ29 = False
+    End If
+End Function
+Function TestTPJ30()
+    FindPic 671, 0, 866, 47, "Attachment:tpj30.png", "000000", 0, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTPJ30 = True
+    Else 
+        TestTPJ30 = False
+    End If
+End Function
+Function TestJieJie()
+    Delay 1000
+    FindPic 200, 77, 1156, 662, "Attachment:jj3.png", "000000", YYLJJSX, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestJieJie = True
+        qdX = qdX - 200 + Int(200 * Rnd())
+        qdY = qdY - 15 + Int(60 * Rnd())
+        
+    Else 
+        TestJieJie = False
+    End If
+End Function
+Function TestJieJie4()
+    Delay 1000
+    FindPic 200, 77, 1156, 662, "Attachment:jj4.png", "000000", 2, 0.8, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestJieJie4 = True
+    Else 
+        TestJieJie4 = False
+    End If
+End Function
+Function TestGJ()
+    Delay 2800
+    
+    AcceptXSFY()
+    FindPic 200, 177, 1156, 670, "Attachment:gj.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestGJ = True
+        qdX = qdX -30 + Int(120 * Rnd())
+        qdY = qdY -10 + Int(50 * Rnd())
+    Else 
+        TestGJ = False
+    End If
+End Function
+Function TestGJ2()
+    Delay 2800
+    AcceptXSFY()
+    FindPic 200, 177, 1156, 670, "Attachment:gj2.png", "000000", 0, 0.85, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestGJ2 = True
+        qdX = qdX -25 + Int(80 * Rnd())
+        qdY = qdY -20 + Int(54 * Rnd())
+    Else 
+        TestGJ2 = False
+    End If
+End Function
+Function TestZB()
+    ''''''''准备
+    FindPic 1103, 519, 1221, 579, "Attachment:zb.png", "000000", 0, 0.85, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestZB = True
+        qdX = qdX -20 + Int(80 * Rnd())
+        qdY = qdY -30 + Int(80 * Rnd())
+    Else 
+        TestZB = False  
+    End If
+End Function
+Function TestQR()
+    ''''''''
+    FindPic 736, 380, 813, 421, "Attachment:queren.png", "000000", 0, 0.85, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestQR = True
+    Else 
+        TestQR = False  
+    End If
+End Function
+Function TestJJTP()
+    FindPic 373, 625, 450, 703, "Attachment:jjtp.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestJJTP = True
+        qdX = qdX + Int(25 * Rnd())
+        qdY = qdY + Int(25 * Rnd())
+    Else 
+        TestJJTP = False     
+    End If
+End Function
+Function TestQD()
+    FindPic 395, 211, 862, 477, "Attachment:qd.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX - 46 -30 + Int(140 * Rnd())
+        qdY = qdY - 6 -30 +Int(36 * Rnd())
+        TestQD = True
+    Else 
+        TestQD = False  
+    End If
+End Function
+'''''''阴阳liaojiejie'''''''''''
+Function TESTYYL()
+    FindPic 1210, 300, 1255, 400, "Attachment:yyl.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TESTYYL = True
+        qdX = qdX -20 + Int(20 * Rnd())
+        qdY = qdY + Int(50 * Rnd())
+    Else 
+        TESTYYL = False  
+    End If
+End Function
+Function TESTXUNZ1()
+    FindPic 307, 160, 387, 255, "Attachment:yyl1.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX -100 + Int(200 * Rnd())
+        qdY = qdY -80 + Int(100 * Rnd())
+        TESTXUNZ1 = True
+    Else 
+        TESTXUNZ1 = False  
+    End If
+End Function
+Function TESTXUNZ2()
+    FindPic 307, 351, 387, 414, "Attachment:yyl1.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TESTXUNZ2 = True
+        qdX = qdX -100 + Int(200 * Rnd())
+        qdY = qdY -80 + Int(100 * Rnd())
+        
+    Else 
+        TESTXUNZ2 = False  
+    End If
+End Function
+Function TESTXUNZ3()
+    FindPic 307, 539, 387, 591, "Attachment:yyl1.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TESTXUNZ3 = True
+        qdX = qdX -100 + Int(200 * Rnd())
+        qdY = qdY -80 + Int(100 * Rnd())
+        
+    Else 
+        TESTXUNZ3 = False  
+    End If
+End Function
+Function TestPO1()
+    FindPic 206, 149, 248, 203, "Attachment:po.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestPO1 = True
+    Else 
+        TestPO1 = False  
+    End If
+End Function
+Function TestPO2()
+    FindPic 206, 328, 248, 374, "Attachment:po.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestPO2 = True
+    Else 
+        TestPO2 = False  
+    End If
+End Function
+Function TestPO3()
+    FindPic 206, 522, 248, 567, "Attachment:po.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestPO3 = True
+    Else 
+        TestPO3 = False  
+    End If
+End Function
+'''''''''''''''悬赏封印'''''''''''''''''
+Function TestXSFY()
+    FindPic 814, 384, 882, 439, "Attachment:js.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestXSFY = True
+    Else 
+        TestXSFY = False  
+    End If
+End Function
+Function AcceptXSFY()
+    If TestXSFY() Then 
+        Tap qdX + 30, qdY + 30
+        Call File.Append(logFile,qdX&","&qdY&"\n")
+        TracePrint "找到攻击面啦"&qdX&","&qdY
+        Delay 1800
+    End If
+End Function
+''''''''''''''''妖怪退治''''''''''''''''''''
+
+Function TestFanhui()
+    FindPic 16, 25, 88, 88, "Attachment:fanhui.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestFanhui = True
+    Else 
+        TestFanhui = False  
+    End If
+End Function
+Function TestFanhui2()
+    FindPic 16, 22, 99, 99, "Attachment:fanhui2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestFanhui2 = True
+    Else 
+        TestFanhui2 = False  
+    End If
+End Function
+Function TestShitou()
+    FindPic 0, 350, 28, 450, "Attachment:shitou.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestShitou = True
+    Else 
+        TestShitou = False  
+    End If
+End Function
+Function TestGuiWang()
+    FindPic 263, 460, 383, 500, "Attachment:guiwang.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestGuiWang = True
+    Else 
+        TestGuiWang = False  
+    End If
+End Function
+Function TestYaoGuai()
+    FindPic 262, 522, 383, 560, "Attachment:yaoguai.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYaoGuai = True
+    Else 
+        TestYaoGuai = False  
+    End If
+End Function
+Function TestQianWang()
+    FindPic 883, 500, 1005, 556, "Attachment:qianwang.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestQianWang = True
+    Else 
+        TestQianWang = False  
+    End If
+End Function
+Function TestTiaoZhan()
+    FindPic 900, 505, 980, 544, "Attachment:tiaozhan.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTiaoZhan = True
+    Else 
+        TestTiaoZhan = False  
+    End If
+End Function
+Function TestHongDM()
+    FindPic 0, 0, 1260, 700, "Attachment:hongdm.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestHongDM = True
+    Else 
+        TestHongDM = False  
+    End If
+End Function
+Function TestTansuo()
+    FindPic 661, 130, 695, 160, "Attachment:tansuo.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTansuo = True
+    Else 
+        TestTansuo = False  
+    End If
+End Function
+Function TestSD1()
+    FindPic 980, 625, 1020, 670, "Attachment:suoding1.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSD1 = True
+    Else 
+        TestSD1 = False  
+    End If
+End Function
+Function TestSD2()
+    FindPic 1025, 625, 1094, 668, "Attachment:suoding2.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSD2 = True
+    Else 
+        TestSD2 = False  
+    End If
+End Function
+Function TestQuanBu()
+    FindPic 30, 525, 96, 569, "Attachment:quanbu.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX + Int(60 * Rnd())
+        qdY = qdY + Int(30 * Rnd())
+        TestQuanBu = True
+    Else 
+        TestQuanBu = False  
+    End If
+End Function
+Function TestN()
+    FindPic 43, 295, 90, 344, "Attachment:n.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX + Int(33 * Rnd())
+        qdY = qdY + Int(40 * Rnd())
+        TestN = True
+    Else 
+        TestN = False  
+    End If
+End Function
+Function TestSS_Denglong()
+    FindPic 266, 500, 908, 700, "Attachment:denglg.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSS_Denglong = True
+    Else 
+        TestSS_Denglong = False  
+    End If
+End Function
+Function TestSS_JishengHun()
+    FindPic 266, 500, 908, 700, "Attachment:jsh.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSS_JishengHun = True
+    Else 
+        TestSS_JishengHun = False  
+    End If
+End Function
+Function TestSS_BaiDM()
+    FindPic 266, 500, 908, 700, "Attachment:bdm.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSS_BaiDM = True
+    Else 
+        TestSS_BaiDM = False  
+    End If
+End Function
+Function TestSS_BaiDM20()
+    FindPic 266, 500, 908, 700, "Attachment:bdm20.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestSS_BaiDM20 = True
+    Else 
+        TestSS_BaiDM20 = False  
+    End If
+End Function
+Function TestMan1()
+    FindPic 207, 212, 587, 421, "Attachment:man.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestMan1 = True
+    Else 
+        TestMan1 = False  
+    End If
+End Function
+Function TestMan2()
+    FindPic 395, 132, 428, 166, "Attachment:man.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestMan2 = True
+    Else 
+        TestMan2 = False  
+    End If
+End Function
+Function TestYaoShu1()
+    FindPic 835, 680, 907, 712, "Attachment:yaoshu.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX + Int(30 * Rnd())
+        qdY = qdY + Int(30 * Rnd())
+        TestYaoShu1 = True
+    Else 
+        TestYaoShu1 = False  
+    End If
+End Function
+Function TestYaoShu2()
+    FindPic 948, 680, 1018, 712, "Attachment:yaoshu.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX + Int(30 * Rnd())
+        qdY = qdY + Int(30 * Rnd())
+        TestYaoShu2 = True
+    Else 
+        TestYaoShu2 = False  
+    End If
+End Function
+Function TestTILI()
+    FindPic 600, 455, 687, 501, "Attachment:tili.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTILI = True
+    Else 
+        TestTILI = False  
+    End If
+End Function
+Function TestTILIEnd()
+    FindPic 600, 455, 687, 501, "Attachment:tili80.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestTILIEnd = True
+    Else 
+        TestTILIEnd = False  
+    End If
+End Function
+Function Test_DangTianBuzai()
+    FindPic 525, 336, 733, 378, "Attachment:dangtianbz.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Test_DangTianBuzai = True
+        qdX = qdX + Int(30 * Rnd())
+        qdY = qdY  + Int(10 * Rnd())
+    Else 
+        Test_DangTianBuzai = False  
+    End If
+End Function
+Function Test_DangTianQuxiao()
+    FindPic 475, 408, 563,454, "Attachment:dangtianquxiao.png", "000000", 0, 0.7, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        Test_DangTianQuxiao = True
+        qdX = qdX - 30 + Int(120 * Rnd())
+        qdY = qdY -10 + Int(40 * Rnd())
+    Else 
+        Test_DangTianQuxiao = False  
+    End If
+End Function
+''''''''''''''''''''''''''''''''''''
+''''御魂函数区域
+''''''''''''''''''''''''''''''''''''
+Function TestYH1()
+    FindPic 166, 641, 240, 698, "Attachment:yh1.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYH1 = True
+        qdX = qdX + Int(35 * Rnd())
+        qdY = qdY + Int(35 * Rnd())
+    Else 
+        TestYH1 = False  
+    End If
+End Function
+Function TestYHDS()
+    FindPic 153, 292, 240, 374, "Attachment:yh2.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHDS = True
+        qdX = qdX + Int(200 * Rnd())
+        qdY = qdY + Int(100 * Rnd())
+    Else 
+        TestYHDS = False  
+    End If
+End Function
+Function TestYHD4C()
+    FindPic 366, 112, 442, 434, "Attachment:yhd4c.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHD4C = True
+    Else 
+        TestYHD4C = False  
+    End If
+End Function
+Function TestYHD5C()
+    FindPic 366, 112, 442, 434, "Attachment:yhd5c.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHD5C = True
+    Else 
+        TestYHD5C = False  
+    End If
+End Function
+Function TestYHD5C2()
+    FindPic 366, 112, 442, 434, "Attachment:yhd5c2.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHD5C2 = True
+    Else 
+        TestYHD5C2 = False  
+    End If
+End Function
+Function TestYHD10C()
+    FindPic 366, 112, 442, 434, "Attachment:yhd10c.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        qdX = qdX - 120 + Int(280 * Rnd())
+        qdY = qdY - 10  + Int(40 * Rnd())
+        TestYHD10C = True
+    Else 
+        TestYHD10C = False  
+    End If
+End Function
+Function TestYHD10C2()
+    FindPic 366, 112, 442, 434, "Attachment:yhd10c2.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHD10C2 = True
+        qdX = qdX - 120 + Int(280 * Rnd())
+        qdY = qdY - 10  + Int(40 * Rnd())
+    Else 
+        TestYHD10C2 = False  
+    End If
+End Function
+Function TestYHZudui()
+    FindPic 606, 472, 686, 521, "Attachment:yhzudui.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHZudui = True
+        qdX = qdX - 30 + Int(110 * Rnd())
+        qdY = qdY - 10  + Int(40 * Rnd())
+    Else 
+        TestYHZudui = False  
+    End If
+End Function
+Function TestYHChuangJ()
+    FindPic 969, 599, 1123, 654, "Attachment:yhchuangj.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHChuangJ = True
+        qdX = qdX - 30 + Int(170 * Rnd())
+        qdY = qdY - 10  + Int(50 * Rnd())
+    Else 
+        TestYHChuangJ = False  
+    End If
+End Function
+Function TestYHChuangJ2()
+    FindPic 838, 566, 919, 614, "Attachment:yhcj.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHChuangJ2 = True
+        qdX = qdX - 39 + Int(120 * Rnd())
+        qdY = qdY - 10  + Int(50 * Rnd())
+    Else 
+        TestYHChuangJ2 = False  
+    End If
+End Function
+Function TestYHYaoQ1()
+    FindPic 642, 417, 774, 536, "Attachment:yhyq.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHYaoQ1 = True
+    Else 
+        TestYHYaoQ1 = False  
+    End If
+End Function
+Function TestYHYaoQ2()
+    FindPic 982, 420, 1121, 536, "Attachment:yhyq.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHYaoQ2 = True
+    Else 
+        TestYHYaoQ2 = False  
+    End If
+End Function
+Function TestYHKSZD()
+    FindPic 961, 567, 1118, 624, "Attachment:kaishizhandou.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHKSZD = True
+        qdX = qdX - 30 + Int(170 * Rnd())
+        qdY = qdY - 17  + Int(60 * Rnd())
+    Else 
+        TestYHKSZD = False  
+    End If
+End Function
+Function TestYHQD()
+    FindPic 714, 404, 800, 451, "Attachment:queding.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHQD = True
+        qdX = qdX -50 + Int(160 * Rnd())
+        qdY = qdY -10 + Int(50 * Rnd())
+    Else 
+        TestYHQD = False  
+    End If
+End Function
+Function TestYHQX()
+    FindPic 484, 407, 558, 453, "Attachment:quxiao.png", "000000", 0, 0.9, qdX, qdY
+    If qdX > -1 And qdY > -1 Then 
+        TestYHQX = True
+        qdX = qdX - 50 + Int(160 * Rnd())
+        qdY = qdY - 10  + Int(50 * Rnd())
+    Else 
+        TestYHQX = False  
+    End If
+End Function
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
